@@ -1,0 +1,71 @@
+{{> /layout/header}}
+
+<div class="container p-5">
+
+    <!-- 버튼 3개 우측정렬 -->
+    <div class="d-flex justify-content-end m-1">
+
+        <button type="button" class="btn btn-outline-info m-1"><a href="/">돌아가기</a></button>
+        <button type="button" class="btn btn-outline-warning m-1">수정</a></button>
+        <button type="button" class="btn btn-outline-danger m-1">삭제</button>
+    </div>
+
+    <!-- 메인 -->
+    <div class="card">
+        <div class="card-body">
+            <!-- 글쓴이 정보 -->
+            <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-start">
+                    <div class="mx-1">글번호: 0</div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <div class="mx-1">작성자: ssar</div>
+                </div>
+            </div>
+            <hr>
+            <!-- 제목 -->
+            <h3>제목입니다.</h3>
+            <hr>
+            <!-- 내용 -->
+            <h5>내용입니다.</h5>
+        </div>
+
+        <!-- 댓글 -->
+        <div class="card">
+            <div class="card-header"><b>댓글</b></div>
+            <form action="/reply/save">
+                <div class="d-flex">
+                    <textarea class="form-control mx-3 mt-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1"
+                        name="text"></textarea>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary m-3">등록</button>
+                </div>
+            </form>
+            <div class="card-footer bg-white"><b>댓글 리스트</b>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>cos-1등</div>
+                        <button type="submit" class="btn ">🗑</button>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            love-2등
+                        </div>
+                        <button type="submit" class="btn ">🗑</button>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            haha-3등
+                        </div>
+                        <button type="submit" class="btn ">🗑</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{{> /layout/footer}}
