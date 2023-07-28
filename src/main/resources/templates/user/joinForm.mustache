@@ -9,16 +9,18 @@
             <form action="/join" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Enter username" name="username">
+                    <input type="text" class="form-control" id="username" placeholder="Enter username" name="username"
+                        required maxlength="20">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" placeholder="Enter password"
-                        name="password">
+                        name="password" required maxlength="20">
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required
+                        maxlength="20">
                 </div>
                 <!--form태그 안의 모든 input을 한번에 전송, submit은 반드시 form태그 안에 있어야 함-->
                 <button type="submit" class="btn btn-primary form-control">회원가입</button>
