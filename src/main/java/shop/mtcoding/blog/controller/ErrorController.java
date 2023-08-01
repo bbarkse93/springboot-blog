@@ -17,4 +17,10 @@ public class ErrorController {
         return "error/ex50x";
 
     }
+
+    @GetMapping("/exLogErr")
+    public String exLogErr() {
+        return "error/exLogErr";
+
+    }
 }

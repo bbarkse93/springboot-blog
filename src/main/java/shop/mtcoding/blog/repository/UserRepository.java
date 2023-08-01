@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.model.User;
 
 // IoC에 떠있는 것들
 // BoardController, UserController, UserRepository
@@ -27,6 +29,14 @@ public class UserRepository {
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
         query.executeUpdate();
+    }
+
+    public User FindByUsernameAndPassword(LoginDTO loginDTO) {
+        Query query = em.createNativeQuery("select * from user_tb where username=:username and password=:password",
+                User.class);
+        query.setParameter("username", loginDTO.getUsername());
+        query.setParameter("password", loginDTO.getPassword());
+        return (User) query.getSingleResult();
     }
 
 }
