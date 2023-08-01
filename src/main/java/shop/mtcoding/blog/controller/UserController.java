@@ -36,8 +36,12 @@ public class UserController {
             return "redirect:/40x";
         }
 
-        // 핵심로직
-        userRepository.save(joinDTO);
+        try {
+            userRepository.save(joinDTO); // 핵심로직
+        } catch (Exception e) {
+            return "redirect:/50x";
+
+        }
 
         return "redirect:/loginForm";
     }
