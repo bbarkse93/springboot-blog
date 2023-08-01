@@ -1,14 +1,19 @@
 package shop.mtcoding.blog.controller;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.WriteDTO;
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
 
@@ -22,7 +27,22 @@ public class BoardController {
     private HttpSession session;
 
     @GetMapping({ "/", "/board" })
-    public String index() {
+    public String index(
+            // RequestParam은 null값일 경우 default값을 입력해준다
+            @RequestParam(defaultValue = "0") Integer page,
+            HttpServletRequest request) {
+        // 1. 유효성 검사 필요 없음
+        // 2. 인증검사 필요 없음
+        List<Board> boarList = boardRepository.findAll(page);
+        System.out.println("TEST: " + boarList.size());
+        System.out.println("TEST: " + boarList.get(0).getTitle());
+
+        request.setAttribute("boardList", boarList);
+        request.setAttribute("prevPage", page - 1);
+        request.setAttribute("nextPage", page + 1);
+        request.setAttribute("first", page == 0 ? true : false);
+        request.setAttribute("last", page);
+
         return "index";
     }
 
@@ -57,7 +77,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping("/board/1")
+    @GetMapping("/board/{id}")
     public String detail() {
         return "/board/detail";
     }
