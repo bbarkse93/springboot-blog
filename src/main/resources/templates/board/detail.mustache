@@ -11,25 +11,28 @@
     </div>
 
     <!-- 메인 -->
+    
     <div class="card">
+        {{#board}}
         <div class="card-body">
             <!-- 글쓴이 정보 -->
             <div class="d-flex justify-content-between">
                 <div class="d-flex justify-content-start">
-                    <div class="mx-1">글번호: 0</div>
+                    <div class="mx-1">글번호: {{id}}</div>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <div class="mx-1">작성자: ssar</div>
+                    <div class="mx-1">작성자: {{username}} </div>
+                    <div class="mx-1">작성시간: {{createdAt}} </div>
                 </div>
             </div>
             <hr>
             <!-- 제목 -->
-            <h3>제목입니다.</h3>
+            <h3>{{title}}</h3>
             <hr>
             <!-- 내용 -->
-            <h5>내용입니다.</h5>
+            <h5>{{content}}</h5>
         </div>
-
+        {{/board}}
         <!-- 댓글 -->
         <div class="card">
             <div class="card-header"><b>댓글</b></div>

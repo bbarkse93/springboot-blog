@@ -1,14 +1,19 @@
 package shop.mtcoding.blog.controller;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.WriteDTO;
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
 
@@ -21,9 +26,11 @@ public class BoardController {
     @Autowired
     private HttpSession session;
 
-    @GetMapping({ "/", "/board" })
-    public String index() {
-        return "index";
+    @GetMapping("/")
+    public String index(HttpServletRequest request) {
+        List<Board> boardList = boardRepository.findAll();
+        request.setAttribute("boardList", boardList);
+        return "/index";
     }
 
     @GetMapping("/board/saveForm")
@@ -57,8 +64,20 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping("/board/1")
-    public String detail() {
+    // @GetMapping("/board/{id}")
+    // public String detail(@PathVariable Integer id, HttpServletRequest request) {
+    // Board board = boardRepository.findById(id);
+    // request.setAttribute("board", board);
+
+    // return "/board/detail";
+    // }
+
+    @GetMapping("/board/{id}")
+    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+        Board board = boardRepository.findById(id);
+        request.setAttribute("username", board.getUser().getUsername());
+        request.setAttribute("board", board);
+
         return "/board/detail";
     }
 
