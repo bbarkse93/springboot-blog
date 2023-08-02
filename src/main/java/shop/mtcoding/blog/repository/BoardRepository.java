@@ -53,4 +53,11 @@ public class BoardRepository {
         return query.getResultList();
 
     }
+
+    public Board findById(Integer id) {
+        Query query = em.createNativeQuery("select * from board_tb where id = :id", Board.class);
+        query.setParameter("id", id);
+        Board board = (Board) query.getSingleResult();
+        return board;
+    }
 }
