@@ -1,7 +1,5 @@
 {{> /layout/header}}
 
-
-
 <div class="container p-5">
     {{#boardList}}
     <div class="card mb-3">
@@ -13,10 +11,8 @@
     {{/boardList}}
     <ul class="d-flex justify-content-center pagination">
         <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
+        <li class="page-item {{#last}}disabled{{/last}}""><a class="page-link" href="?page={{nextPage}}">Next</a></li>
     </ul>
 </div>
-
-
 
 {{> /layout/footer}}

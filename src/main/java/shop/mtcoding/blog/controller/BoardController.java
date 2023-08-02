@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -33,15 +34,26 @@ public class BoardController {
             HttpServletRequest request) {
         // 1. 유효성 검사 필요 없음
         // 2. 인증검사 필요 없음
-        List<Board> boarList = boardRepository.findAll(page);
-        System.out.println("TEST: " + boarList.size());
-        System.out.println("TEST: " + boarList.get(0).getTitle());
+
+        List<Board> boarList = boardRepository.findAll(page); // page = 1
+
+        int totalcount = boardRepository.count(); // totalCount = 5
+        int totalpage = totalcount / 3; // totalPage = 1
+        if (totalcount % 3 > 0) {
+            totalpage = totalpage + 1; // totalPage = 2
+        }
+        boolean last = totalpage - 1 == page;
+
+        // System.out.println("TEST: " + boarList.size());
+        // System.out.println("TEST: " + boarList.get(0).getTitle());
 
         request.setAttribute("boardList", boarList);
         request.setAttribute("prevPage", page - 1);
         request.setAttribute("nextPage", page + 1);
         request.setAttribute("first", page == 0 ? true : false);
-        request.setAttribute("last", page);
+        request.setAttribute("last", last);
+        request.setAttribute("totalCount", totalcount);
+        request.setAttribute("totalPage", totalpage);
 
         return "index";
     }
@@ -78,7 +90,7 @@ public class BoardController {
     }
 
     @GetMapping("/board/{id}")
-    public String detail() {
+    public String detail(@PathVariable Integer id) {
         return "/board/detail";
     }
 

@@ -1,5 +1,6 @@
 package shop.mtcoding.blog.repository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -28,10 +29,23 @@ public class BoardRepository {
         query.executeUpdate();
     }
 
+    // select id, title from board)tb
+    // resultClass 안붙이고 직접 파싱하려면
+    // Object[]로 리턴 됨
+    // ex- Object[0] = 1 , Object[1] = 안녕
+    public int count() {
+        // Entity 타입이 아니어도, 기본 자료형도 리턴이 된다. 사실 안되더라
+        Query query = em.createNativeQuery("select count(*) from board_tb");
+        BigInteger count = (BigInteger) query.getSingleResult();
+        return count.intValue();
+
+    }
+
     public List<Board> findAll(int page) {
         // 상수(대문자)
         final int SIZE = 3;
         Query query = em.createNativeQuery("select * from board_tb order by id desc limit :page, :size", Board.class);
+
         // localhost:8080/page=0
         query.setParameter("page", page * SIZE);
         query.setParameter("size", SIZE);
