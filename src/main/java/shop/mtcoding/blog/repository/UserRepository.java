@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 
 // IoC에 떠있는 것들
@@ -37,6 +38,22 @@ public class UserRepository {
         query.setParameter("username", loginDTO.getUsername());
         query.setParameter("password", loginDTO.getPassword());
         return (User) query.getSingleResult();
+    }
+
+    public User findById(Integer id) {
+        Query query = em.createNativeQuery("select * from user_tb where id = :id", User.class);
+        query.setParameter("id", id);
+        User user = (User) query.getSingleResult();
+        return user;
+    }
+
+    @Transactional
+    public void update(Integer id, UserUpdateDTO userUpdateDTO) {
+        Query query = em.createNativeQuery(
+                "update user_tb set password = :password where id = :id");
+        query.setParameter("id", id);
+        query.setParameter("password", userUpdateDTO.getPassword());
+        query.executeUpdate();
     }
 
 }

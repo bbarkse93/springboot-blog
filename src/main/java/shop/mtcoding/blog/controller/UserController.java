@@ -5,11 +5,14 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
@@ -137,5 +140,18 @@ public class UserController {
     public String logout() {
         session.invalidate();
         return "redirect:/";
+    }
+
+    @PostMapping("user/{id}/update")
+    public String update(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
+        // 1. 인증검사
+        // 2. 권한검사
+        // 3. 핵심로직
+        // update user_tb set username = :username, password = :password, email = :email
+        // where id = :id;
+        // User user = userRepository.findById(id);
+        userRepository.update(id, userUpdateDTO);
+        return "redirect:/";
+
     }
 }

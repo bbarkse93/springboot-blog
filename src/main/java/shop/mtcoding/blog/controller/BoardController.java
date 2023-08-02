@@ -27,6 +27,7 @@ public class BoardController {
     @Autowired
     private HttpSession session;
 
+    // index페이지를 줘!(글목록페이지)
     @GetMapping({ "/", "/board" })
     public String index(
             // RequestParam은 null값일 경우 default값을 입력해준다
@@ -58,6 +59,7 @@ public class BoardController {
         return "index";
     }
 
+    // 글쓰기 페이지를 줘!!
     @GetMapping("/board/saveForm")
     public String saveForm() {
         // 인증체크
@@ -68,20 +70,47 @@ public class BoardController {
         return "/board/saveForm";
     }
 
+    // 글수정 페이지를 줘!!
     @GetMapping("/board/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        // 2-1. 인증체크
+        // 1. 인증체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm"; //
+        }
 
-        // 2-2. 권한검사
+        // 2. 권한검사
+        Board board = boardRepository.findById(id);
+        if (sessionUser.getId() != board.getUser().getId()) {
+            return "redirect:/40x";
+        }
 
         // 3. 핵심 로직:
-        Board board = boardRepository.findById(id);
         request.setAttribute("board", board);
 
         return "board/updateForm";
 
     }
 
+    // id가 @@인 보드를 줘!
+    @GetMapping("/board/{id}")
+    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 세션 접근
+        Board board = boardRepository.findById(id);
+
+        Boolean pageOwner = false; // 세션 초기값 false
+        if (sessionUser != null) {
+            pageOwner = sessionUser.getId() == board.getUser().getId();
+        }
+
+        request.setAttribute("board", board); // request에 board 담기
+        request.setAttribute("userName", board.getUser().getUsername()); // request에 유저네임 담기
+        request.setAttribute("pageOwner", pageOwner); // request에 세션에 접근한 pageOwner값(true or false) 담기
+
+        return "/board/detail";
+    }
+
+    // 글을 인서트 해줘!!
     @PostMapping("/board/save")
     public String save(WriteDTO writeDTO) {
         // 유효성 검사
@@ -103,23 +132,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
-        User sessionUser = (User) session.getAttribute("sessionUser"); // 세션 접근
-        Board board = boardRepository.findById(id);
-
-        Boolean pageOwner = false; // 세션 초기값 false
-        if (sessionUser != null) {
-            pageOwner = sessionUser.getId() == board.getUser().getId();
-        }
-
-        request.setAttribute("board", board); // request에 board 담기
-        request.setAttribute("userName", board.getUser().getUsername()); // request에 유저네임 담기
-        request.setAttribute("pageOwner", pageOwner); // request에 세션에 접근한 pageOwner값(true or false) 담기
-
-        return "/board/detail";
-    }
-
+    // 번호가 id인 글을 딜리트 해줘!!
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable Integer id) { // Pathvariable 값 받기
 
@@ -147,10 +160,19 @@ public class BoardController {
         return "redirect:/";
     }
 
+    // 번호가 id인 글을 수정해 줘!
     @PostMapping("/board/{id}/update")
     public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
         // 1. 인증 체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
         // 2. 권한 검사
+        Board board = boardRepository.findById(id);
+        if (sessionUser.getId() != board.getUser().getId()) {
+            return "redirect:/40x";
+        }
         // 3. 핵심 로직
         // update board_tb set title = :title, content = :content where id = :id;
         boardRepository.update(updateDTO, id);
