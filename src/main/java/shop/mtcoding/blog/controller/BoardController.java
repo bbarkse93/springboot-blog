@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.h2.command.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -94,16 +95,41 @@ public class BoardController {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션 접근
         Board board = boardRepository.findById(id);
 
-        Boolean pageOwner = false;
+        Boolean pageOwner = false; // 세션 초기값 false
         if (sessionUser != null) {
             pageOwner = sessionUser.getId() == board.getUser().getId();
         }
 
-        request.setAttribute("board", board);
-        request.setAttribute("userName", board.getUser().getUsername());
-        request.setAttribute("pageOwner", pageOwner);
+        request.setAttribute("board", board); // request에 board 담기
+        request.setAttribute("userName", board.getUser().getUsername()); // request에 유저네임 담기
+        request.setAttribute("pageOwner", pageOwner); // request에 세션에 접근한 pageOwner값(true or false) 담기
 
         return "/board/detail";
     }
 
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable Integer id) { // Pathvariable 값 받기
+
+        // 2. 인증체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm"; //
+        }
+        // 200번대는 잘 됐으니까 크게 신경 안써도 되고
+        // 300번대는 redirection이기에 중요도 낮다
+        // 하지만 400번대는 클라이언트의 오류이기때문에 상세하게 응답해야한다.
+        // 404 view를 찾지 못했을 때
+        // 405 method가 다를 때
+
+        Board board = boardRepository.findById(id);
+        if (sessionUser.getId() != board.getUser().getId()) {
+            return "redirect:/40x";
+        }
+
+        // 3. 모델에 접근해서 삭제
+        // delete from board_tb where id = :id
+        boardRepository.deleteById(id);
+
+        return "redirect:/";
+    }
 }
