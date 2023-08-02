@@ -6,7 +6,7 @@
     {{#pageOwner}}
     <div class="d-flex justify-content-end m-1">
         <button type="button" class="btn btn-outline-info m-1"><a href="/">돌아가기</a></button>
-        <button type="button" class="btn btn-outline-warning m-1">수정</a></button>
+        <a class="btn btn-outline-warning m-1" href="/board/{{board.id}}/updateForm">수정</a>
         <form action="/board/{{board.id}}/delete" method="post" >
         <button type="submit" class="btn btn-outline-danger m-1">삭제</button>
         </form>

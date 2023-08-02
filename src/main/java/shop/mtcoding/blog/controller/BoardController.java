@@ -2,11 +2,9 @@ package shop.mtcoding.blog.controller;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.h2.command.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -69,6 +68,20 @@ public class BoardController {
         return "/board/saveForm";
     }
 
+    @GetMapping("/board/{id}/updateForm")
+    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
+        // 2-1. 인증체크
+
+        // 2-2. 권한검사
+
+        // 3. 핵심 로직:
+        Board board = boardRepository.findById(id);
+        request.setAttribute("board", board);
+
+        return "board/updateForm";
+
+    }
+
     @PostMapping("/board/save")
     public String save(WriteDTO writeDTO) {
         // 유효성 검사
@@ -110,7 +123,7 @@ public class BoardController {
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable Integer id) { // Pathvariable 값 받기
 
-        // 2. 인증체크
+        // 1. 인증체크
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm"; //
@@ -121,6 +134,7 @@ public class BoardController {
         // 404 view를 찾지 못했을 때
         // 405 method가 다를 때
 
+        // 2. 권한검사
         Board board = boardRepository.findById(id);
         if (sessionUser.getId() != board.getUser().getId()) {
             return "redirect:/40x";
@@ -132,4 +146,16 @@ public class BoardController {
 
         return "redirect:/";
     }
+
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
+        // 1. 인증 체크
+        // 2. 권한 검사
+        // 3. 핵심 로직
+        // update board_tb set title = :title, content = :content where id = :id;
+        boardRepository.update(updateDTO, id);
+
+        return "redirect:/board/{id}";
+    }
+
 }
