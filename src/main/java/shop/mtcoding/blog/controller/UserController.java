@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
 import shop.mtcoding.blog.dto.UserUpdateDTO;
-
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
@@ -145,6 +145,10 @@ public class UserController {
 
     @GetMapping("/user/updateForm")
     public String updateForm() {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
         return "user/updateForm";
     }
 
@@ -157,7 +161,17 @@ public class UserController {
     @PostMapping("user/{id}/update")
     public String update(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
         // 1. 인증검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
+
         // 2. 권한검사
+        User user = userRepository.findById(id);
+        if (sessionUser.getId() != user.getId()) {
+            return "redirect:/40x";
+        }
+
         // 3. 핵심로직
         // update user_tb set username = :username, password = :password, email = :email
         // where id = :id;
