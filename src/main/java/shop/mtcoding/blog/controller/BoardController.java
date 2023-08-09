@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import shop.mtcoding.blog.dto.BoardDetailDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
+import shop.mtcoding.blog.model.Reply;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
+import shop.mtcoding.blog.repository.ReplyRepository;
 
 @Controller
 public class BoardController {
@@ -25,7 +29,24 @@ public class BoardController {
     private BoardRepository boardRepository;
 
     @Autowired
+    private ReplyRepository replyRepository;
+
+    @Autowired
     private HttpSession session;
+
+    @ResponseBody
+    @GetMapping("/test/board/1")
+    public Board test() {
+        Board board = boardRepository.findById(1);
+        return board;
+    }
+
+    @ResponseBody
+    @GetMapping("/test/reply")
+    public List<Reply> test1() {
+        List<Reply> replies = replyRepository.findByBoardId(4);
+        return replies;
+    }
 
     // index페이지를 줘!(글목록페이지)
     @GetMapping({ "/", "/board" })
@@ -62,30 +83,30 @@ public class BoardController {
     // 글쓰기 페이지를 줘!!
     @GetMapping("/board/saveForm")
     public String saveForm() {
-        // 인증체크
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm";
         }
+
         return "/board/saveForm";
     }
 
     // 글수정 페이지를 줘!!
     @GetMapping("/board/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        // 1. 인증체크
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm"; //
         }
 
-        // 2. 권한검사
+        // 권한 검사
         Board board = boardRepository.findById(id);
         if (sessionUser.getId() != board.getUser().getId()) {
             return "redirect:/40x";
         }
 
-        // 3. 핵심 로직:
         request.setAttribute("board", board);
 
         return "board/updateForm";
@@ -96,18 +117,24 @@ public class BoardController {
     @GetMapping("/board/{id}")
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션 접근
-        Board board = boardRepository.findById(id);
+
+        List<BoardDetailDTO> dtos = null;
+
+        if (sessionUser == null) {
+            dtos = boardRepository.findByIdJoinReply(id, null);
+        } else {
+            dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());
+        }
 
         Boolean pageOwner = false; // 세션 초기값 false
         if (sessionUser != null) {
-            pageOwner = sessionUser.getId() == board.getUser().getId();
+            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
         }
 
-        request.setAttribute("board", board); // request에 board 담기
-        request.setAttribute("userName", board.getUser().getUsername()); // request에 유저네임 담기
+        request.setAttribute("dtos", dtos); // request에 board 담기
         request.setAttribute("pageOwner", pageOwner); // request에 세션에 접근한 pageOwner값(true or false) 담기
 
-        return "/board/detail";
+        return "board/detail";
     }
 
     // 글을 인서트 해줘!!
@@ -121,12 +148,13 @@ public class BoardController {
             return "redirect:/40x";
         }
 
-        // 인증체크
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm";
         }
 
+        // 핵심로직: 게시글 작성
         boardRepository.save(writeDTO, sessionUser.getId());
 
         return "redirect:/";
@@ -136,7 +164,7 @@ public class BoardController {
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable Integer id) { // Pathvariable 값 받기
 
-        // 1. 인증체크
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm"; //
@@ -147,13 +175,13 @@ public class BoardController {
         // 404 view를 찾지 못했을 때
         // 405 method가 다를 때
 
-        // 2. 권한검사
+        // 권한 검사
         Board board = boardRepository.findById(id);
         if (sessionUser.getId() != board.getUser().getId()) {
             return "redirect:/40x";
         }
 
-        // 3. 모델에 접근해서 삭제
+        // 핵심 로직: 게시글 삭제
         // delete from board_tb where id = :id
         boardRepository.deleteById(id);
 
@@ -163,18 +191,18 @@ public class BoardController {
     // 번호가 id인 글을 수정해 줘!
     @PostMapping("/board/{id}/update")
     public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
-        // 1. 인증 체크
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm";
         }
-        // 2. 권한 검사
+        // 권한 검사
         Board board = boardRepository.findById(id);
         if (sessionUser.getId() != board.getUser().getId()) {
             return "redirect:/40x";
         }
-        // 3. 핵심 로직
-        // update board_tb set title = :title, content = :content where id = :id;
+        // 핵심 로직: 게시글 수정
+        // query: update board_tb set title = :title, content = :content where id = :id;
         boardRepository.update(updateDTO, id);
 
         return "redirect:/board/{id}";

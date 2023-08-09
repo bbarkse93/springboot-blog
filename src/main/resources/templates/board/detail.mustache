@@ -6,11 +6,11 @@
     {{#pageOwner}}
     <div class="d-flex justify-content-end m-1">
         <button type="button" class="btn btn-outline-info m-1"><a href="/">돌아가기</a></button>
-        <a class="btn btn-outline-warning m-1" href="/board/{{board.id}}/updateForm">수정</a>
-        <form action="/board/{{board.id}}/delete" method="post" >
-        <button type="submit" class="btn btn-outline-danger m-1">삭제</button>
+        <a class="btn btn-outline-warning m-1" href="/board/{{dtos.0.boardId}}/updateForm">수정</a>
+        <form action="/board/{{dtos.0.boardId}}/delete" method="post">
+            <button type="submit" class="btn btn-outline-danger m-1">삭제</button>
         </form>
-        {{! button의 타입은 기본값이 폼태그 안에 있으면 submit이고 폼 태그 밖에 있으면 button이다.  }}
+        {{! button의 타입은 기본값이 폼태그 안에 있으면 submit이고 폼 태그 밖에 있으면 button이다. }}
     </div>
     {{/pageOwner}}
     {{^pageOwner}}
@@ -21,9 +21,9 @@
 
     <!-- 메인 -->
     <div class="card">
-            {{#board}}
         <div class="card-body">
             <!-- 글쓴이 정보 -->
+            {{#board}}
             <div class="d-flex justify-content-between">
                 <div class="d-flex justify-content-start">
                     <div class="mx-1">{{id}}</div>
@@ -34,19 +34,19 @@
                 </div>
             </div>
             <hr>
+            {{/board}}
             <!-- 제목 -->
-            <h3>{{title}}</h3>
+            <h3>{{dtos.0.boardTitle}}</h3>
             <hr>
             <!-- 내용 -->
-            <h5>{{content}}</h5>
+            <h5>{{dtos.0.boardContent}}</h5>
         </div>
-            {{/board}}
 
         <!-- 댓글 -->
         <div class="card">
             <div class="card-header"><b>댓글</b></div>
             <form action="/reply/save" method="post">
-                <input type="hidden" name="boardId" value="{{board.id}}">
+                <input type="hidden" name="boardId" value="{{dtos.0.boardId}}">
                 <div class="d-flex">
                     <textarea class="form-control mx-3 mt-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1"
                         name="comment"></textarea>
@@ -55,30 +55,32 @@
                     <button type="submit" class="btn btn-primary m-3">등록</button>
                 </div>
             </form>
+
             <div class="card-footer bg-white"><b>댓글 리스트</b>
+                <hr />
+                {{#dtos}}
+                {{#replyUserId}}
                 <ul class="list-group list-group-flush">
+                    <!-- 댓글 아이템-->
+                    <div>작성자: {{replyUserUsername}}</div>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div></div>
-                        <button type="submit" class="btn ">🗑</button>
+                        <div>{{replyComment}}</div>
+                        {{#replyOwner}}
+                        <form action="/reply/{{replyId}}/delete" method="post">
+                            <input type="hidden" name="boardId" value="{{boardId}}">
+                            <button type="submit" class="btn" onclick="replyRemove">🗑</button>
+                        </form>
+                        {{/replyOwner}}
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <div>
-                            love-2등
-                        </div>
-                        <button type="submit" class="btn ">🗑</button>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <div>
-                            haha-3등
-                        </div>
-                        <button type="submit" class="btn ">🗑</button>
-                    </li>
+
                 </ul>
+                <hr />
+                {{/replyUserId}}
+                {{/dtos}}
             </div>
         </div>
     </div>
 </div>
-
 
 
 {{> /layout/footer}}
