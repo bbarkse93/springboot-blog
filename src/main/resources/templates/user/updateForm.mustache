@@ -6,15 +6,15 @@
         <div class="card-body">
             <!-- 요청을 하면 localhost:8080/login POST로 요청됨-->
             <!-- password=사용자 입력값-->
-            <form action="/user/{{sessionUser.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
+            <form action="/user/{{user.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3">
-                    <input type="text" class="form-control" name="username" disabled value={{sessionUser.username}}>
+                    <input type="text" class="form-control" name="username" disabled value={{user.username}}>
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" name="password" value={{sessionUser.password}}>
+                    <input type="password" class="form-control" name="password" value={{user.password}}>
                 </div>
                 <div class="mb-3">
-                    <input type="email" class="form-control" id="email" name="email" disabled value={{sessionUser.email}}>
+                    <input type="email" class="form-control" id="email" name="email" disabled value={{user.email}}>
                 </div>
                 <!--form태그 안의 모든 input을 한번에 전송, submit은 반드시 form태그 안에 있어야 함-->
                 <button type="submit" class="btn btn-primary form-control">정보수정</button>

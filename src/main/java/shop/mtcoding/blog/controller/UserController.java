@@ -1,7 +1,9 @@
 package shop.mtcoding.blog.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,9 +65,15 @@ public class UserController {
 
         try {
             // 핵심기능
-            User user = userRepository.findByUsernameAndPassword(loginDTO);
-            session.setAttribute("sessionUser", user);
-            return "redirect:/";
+            User user = userRepository.findByUsername(loginDTO.getUsername());
+            boolean isvalid = BCrypt.checkpw(loginDTO.getPassword(), user.getPassword());
+            if (isvalid) {
+                session.setAttribute("sessionUser", user);
+                return "redirect:/";
+            } else {
+                return "redirect:/loginForm";
+            }
+
         } catch (Exception e) {
             return "redirect:/exLogErr";
         }
@@ -143,11 +151,22 @@ public class UserController {
     }
 
     @GetMapping("/user/updateForm")
-    public String updateForm() {
+    public String updateForm(HttpServletRequest request) {
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm";
         }
+
+        // 권한 검사 할 필요 없음
+        // 왜 WHY? -> 세션으로 접근하기 때문에
+
+        // 왜 findById로 할까?
+        // id는 PK이기 때문에 인덱스를 타기 때문에
+        // username도 UK라서 가능함.
+        User user = userRepository.findByUsername(sessionUser.getUsername());
+
+        request.setAttribute("user", user);
         return "user/updateForm";
     }
 

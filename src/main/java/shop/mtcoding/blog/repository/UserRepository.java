@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,17 +25,16 @@ public class UserRepository {
     // Trasaction(상대적인 일의 최소 단위)
     @Transactional // 롤백과 커밋을 자동으로 실행
     public void save(JoinDTO joinDTO) {
-        System.out.println("Test: " + 1);
+
         Query query = em.createNativeQuery(
                 "insert into user_tb(username, password, email) values(:username, :password, :email)");
-        System.out.println("Test: " + 2);
         // 새로운 기술을 도입하려면 문서를 작성해라 (aka.샘플코드)
         query.setParameter("username", joinDTO.getUsername());
-        query.setParameter("password", joinDTO.getPassword());
+        String password = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+        query.setParameter("password", password);
         query.setParameter("email", joinDTO.getEmail());
-        System.out.println("Test: " + 3);
         query.executeUpdate(); // 쿼리를 전송 (DBMS)
-        System.out.println("Test: " + 4);
+
     }
 
     public User findByUsername(String username) {
@@ -69,7 +69,8 @@ public class UserRepository {
         Query query = em.createNativeQuery(
                 "update user_tb set password = :password where id = :id");
         query.setParameter("id", id);
-        query.setParameter("password", userUpdateDTO.getPassword());
+        String password = BCrypt.hashpw(userUpdateDTO.getPassword(), BCrypt.gensalt());
+        query.setParameter("password", password);
         query.executeUpdate();
     }
 
