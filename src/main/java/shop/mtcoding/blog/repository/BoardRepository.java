@@ -47,6 +47,14 @@ public class BoardRepository {
         return count.intValue();
     }
 
+    public int count(String keyword) {
+
+        Query query = em.createNativeQuery("select count(*) from board_tb where title like :keyword");
+        query.setParameter("keyword", "%" + keyword + "%");
+        BigInteger count = (BigInteger) query.getSingleResult();
+        return count.intValue();
+    }
+
     public List<Board> findAll(int page) {
         // 상수(대문자)
         final int SIZE = 3;
@@ -55,6 +63,17 @@ public class BoardRepository {
         // localhost:8080/page=0
         query.setParameter("page", page * SIZE);
         query.setParameter("size", SIZE);
+
+        return query.getResultList();
+    }
+
+    public List<Board> findAll(int page, String keyword) {
+        final int SIZE = 3;
+        Query query = em.createNativeQuery(
+                "select * from board_tb where title like :keyword order by id desc limit :page, :size", Board.class);
+        query.setParameter("page", page * SIZE);
+        query.setParameter("size", SIZE);
+        query.setParameter("keyword", "%" + keyword + "%");
 
         return query.getResultList();
     }

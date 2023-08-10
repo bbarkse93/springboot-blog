@@ -1,6 +1,29 @@
 {{> /layout/header}}
 
 <div class="container p-5">
+
+    <div class="mb-2 d-flex justify-content-end">
+        <form class="d-flex" action="/" method="get" onsubmit="return valid()">
+            <input class="form-control me-2" type="text" name="keyword" id="keyword" placeholder="Search" required>
+            <button class="btn btn-primary" type="submit" style="white-space: nowrap">검색</button>
+        </form>
+    </div>
+
+    <script>
+        function iswhitespace(str) {
+            return str.trim() === '';
+        }
+
+        function valid() {
+            let keyword = document.querySelector("#keyword").value;
+            if (iswhitespace(keyword)) {
+                alert('공백을 입력할 수 없습니다.');
+                return false;
+            }
+        }
+    </script>
+
+
     {{#boardList}}
     <div class="card mb-3">
         <div class="card-body">
@@ -9,9 +32,14 @@
         </div>
     </div>
     {{/boardList}}
+
     <ul class="d-flex justify-content-center pagination">
-        <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
-        <li class="page-item {{#last}}disabled{{/last}}""><a class="page-link" href="?page={{nextPage}}">Next</a></li>
+        <li class="page-item {{#first}}disabled{{/first}}">
+            <a class="page-link" href="?page={{prevPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}">Previous</a>
+        </li>
+        <li class="page-item {{#last}}disabled{{/last}}"">
+        <a class=" page-link" href="?page={{nextPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}">Next</a>
+        </li>
     </ul>
 </div>
 

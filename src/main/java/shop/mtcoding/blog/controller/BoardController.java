@@ -48,33 +48,49 @@ public class BoardController {
         return replies;
     }
 
+    @ResponseBody
+    @GetMapping("/test/count")
+    public String countTest() {
+        int count = boardRepository.count("나");
+        return "제목에 '나'가 포한된 게시글 수: " + count;
+    }
+
     // index페이지를 줘!(글목록페이지)
     @GetMapping({ "/", "/board" })
     public String index(
             // RequestParam은 null값일 경우 default값을 입력해준다
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") Integer page,
             HttpServletRequest request) {
+
         // 1. 유효성 검사 필요 없음
         // 2. 인증검사 필요 없음
 
-        List<Board> boarList = boardRepository.findAll(page); // page = 1
+        List<Board> boarList = null;
+        int totalCount = 0;
+        request.setAttribute("keyword", keyword); // 공백 or 값 있음
+        if (keyword.isBlank()) {
+            boarList = boardRepository.findAll(page);
+            totalCount = boardRepository.count();
 
-        int totalcount = boardRepository.count(); // totalCount = 5
-        int totalpage = totalcount / 3; // totalPage = 1
-        if (totalcount % 3 > 0) {
+        } else {
+            boarList = boardRepository.findAll(page, keyword);
+            totalCount = boardRepository.count(keyword);
+        }
+
+        // totalCount = 6
+        int totalpage = totalCount / 3; // totalPage = 1
+        if (totalCount % 3 > 0) {
             totalpage = totalpage + 1; // totalPage = 2
         }
         boolean last = totalpage - 1 == page;
-
-        // System.out.println("TEST: " + boarList.size());
-        // System.out.println("TEST: " + boarList.get(0).getTitle());
 
         request.setAttribute("boardList", boarList);
         request.setAttribute("prevPage", page - 1);
         request.setAttribute("nextPage", page + 1);
         request.setAttribute("first", page == 0 ? true : false);
         request.setAttribute("last", last);
-        request.setAttribute("totalCount", totalcount);
+        request.setAttribute("totalCount", totalCount);
         request.setAttribute("totalPage", totalpage);
 
         return "index";
