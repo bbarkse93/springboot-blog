@@ -48,12 +48,11 @@
             <form action="/reply/save" method="post">
                 <input type="hidden" name="boardId" value="{{dtos.0.boardId}}">
                 <div class="d-flex">
-                    <textarea class="form-control mx-3 mt-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1"
+                    <textarea class="form-control m-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1"
                         name="comment"></textarea>
+                    <button type="submit" class="btn btn-primary m-3" style="white-space: nowrap">등록</button>
                 </div>
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary m-3">등록</button>
-                </div>
+                
             </form>
 
             <div class="card-footer bg-white"><b>댓글 리스트</b>
