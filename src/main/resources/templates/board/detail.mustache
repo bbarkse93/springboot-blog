@@ -1,85 +1,101 @@
 {{> /layout/header}}
 
 <div class="container p-5">
+  <!-- 버튼 3개 우측정렬 -->
+  {{#pageOwner}}
+  <div class="d-flex justify-content-end m-1">
+    <button type="button" class="btn btn-outline-info m-1">
+      <a href="/">돌아가기</a>
+    </button>
+    <a class="btn btn-outline-warning m-1" href="/board/{{dtos.0.boardId}}/updateForm">수정</a>
+    <form action="/board/{{dtos.0.boardId}}/delete" method="post">
+      <button type="submit" class="btn btn-outline-danger m-1">삭제</button>
+    </form>
+    {{! button의 타입은 기본값이 폼태그 안에 있으면 submit이고 폼 태그 밖에 있으면 button이다. }}
+  </div>
+  {{/pageOwner}}
+  {{^pageOwner}}
+  <div class="d-flex justify-content-end m-1">
+    <button type="button" class="btn btn-outline-info m-1">
+      <a href="/">돌아가기</a>
+    </button>
+  </div>
+  {{/pageOwner}}
 
-    <!-- 버튼 3개 우측정렬 -->
-    {{#pageOwner}}
-    <div class="d-flex justify-content-end m-1">
-        <button type="button" class="btn btn-outline-info m-1"><a href="/">돌아가기</a></button>
-        <a class="btn btn-outline-warning m-1" href="/board/{{dtos.0.boardId}}/updateForm">수정</a>
-        <form action="/board/{{dtos.0.boardId}}/delete" method="post">
-            <button type="submit" class="btn btn-outline-danger m-1">삭제</button>
-        </form>
-        {{! button의 타입은 기본값이 폼태그 안에 있으면 submit이고 폼 태그 밖에 있으면 button이다. }}
+  <!-- 메인 -->
+  <div class="card">
+    <div class="card-body">
+      <!-- 제목 -->
+      <h3>{{dtos.0.boardTitle}}</h3>
+      <hr class="m-0" />
+      <!-- 글쓴이 정보 -->
+      {{#list}}
+      <div class="d-flex justify-content-between" style="font-size: 15px">
+        <p class="mx-1">작성자: {{ userUsername }}</p>
+        <p class="mx-1" id="formattedDateTime">{{ boardCreatedAt }}</p>
+      </div>
+      {{/list}}
+      <!-- 내용 -->
+      <div class="m-3">
+        <h5>{{dtos.0.boardContent}}</h5>
+      </div>
     </div>
-    {{/pageOwner}}
-    {{^pageOwner}}
-    <div class="d-flex justify-content-end m-1">
-        <button type="button" class="btn btn-outline-info m-1"><a href="/">돌아가기</a></button>
-    </div>
-    {{/pageOwner}}
 
-    <!-- 메인 -->
+    <!-- 댓글 -->
     <div class="card">
-        <div class="card-body">
-            <!-- 글쓴이 정보 -->
-            {{#board}}
-            <div class="d-flex justify-content-between">
-                <div class="d-flex justify-content-start">
-                    <div class="mx-1">{{id}}</div>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <div class="mx-1">{{userName}}</div>
-
-                </div>
-            </div>
-            <hr>
-            {{/board}}
-            <!-- 제목 -->
-            <h3>{{dtos.0.boardTitle}}</h3>
-            <hr>
-            <!-- 내용 -->
-            <h5>{{dtos.0.boardContent}}</h5>
+      <div class="card-header"><b>댓글</b></div>
+      <form action="/reply/save" method="post">
+        <input type="hidden" name="boardId" value="{{dtos.0.boardId}}" />
+        <div class="d-flex">
+          <textarea class="form-control m-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1" name="comment"></textarea>
+          <button type="submit" class="btn btn-primary m-3" style="white-space: nowrap">
+            등록
+          </button>
         </div>
+      </form>
 
-        <!-- 댓글 -->
-        <div class="card">
-            <div class="card-header"><b>댓글</b></div>
-            <form action="/reply/save" method="post">
-                <input type="hidden" name="boardId" value="{{dtos.0.boardId}}">
-                <div class="d-flex">
-                    <textarea class="form-control m-3 flex-grow-2" placeholder="댓글을 입력해주세요" rows="1"
-                        name="comment"></textarea>
-                    <button type="submit" class="btn btn-primary m-3" style="white-space: nowrap">등록</button>
-                </div>
-                
+      <div class="card-footer bg-white">
+        <b>댓글 리스트</b>
+        <hr />
+        {{#dtos}}
+        {{#replyUserId}}
+        <ul class="list-group list-group-flush">
+          <!-- 댓글 아이템-->
+          <div>작성자: {{ replyUserUsername }}</div>
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center">
+            <div>{{ replyComment }}</div>
+            {{#replyOwner}}
+            <form action="/reply/{{ replyId }}/delete" method="post">
+              <input type="hidden" name="boardId" value="{{ boardId }}" />
+              <button type="submit" class="btn" onclick="replyRemove">🗑</button>
             </form>
-
-            <div class="card-footer bg-white"><b>댓글 리스트</b>
-                <hr />
-                {{#dtos}}
-                {{#replyUserId}}
-                <ul class="list-group list-group-flush">
-                    <!-- 댓글 아이템-->
-                    <div>작성자: {{replyUserUsername}}</div>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>{{replyComment}}</div>
-                        {{#replyOwner}}
-                        <form action="/reply/{{replyId}}/delete" method="post">
-                            <input type="hidden" name="boardId" value="{{boardId}}">
-                            <button type="submit" class="btn" onclick="replyRemove">🗑</button>
-                        </form>
-                        {{/replyOwner}}
-                    </li>
-
-                </ul>
-                <hr />
-                {{/replyUserId}}
-                {{/dtos}}
-            </div>
-        </div>
+            {{/replyOwner}}
+          </li>
+        </ul>
+        <hr />
+        {{/replyUserId}}
+        {{/dtos}}
+      </div>
     </div>
+  </div>
 </div>
 
+<script>
+  let currentDateTime = new Date();
+  let options = {
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
 
+  let formatter = new Intl.DateTimeFormat("en-US", options);
+  let formattedDateTime = formatter.format(currentDateTime);
+
+  document.getElementById("formattedDateTime").textContent =
+    "작성시간: " + formattedDateTime;
+</script>
 {{> /layout/footer}}

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import shop.mtcoding.blog.dto.BoardDetailDTO;
+import shop.mtcoding.blog.dto.BoardWriteDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
@@ -135,6 +136,16 @@ public class BoardRepository {
         List<BoardDetailDTO> dtos = mapper.list(query, BoardDetailDTO.class);
 
         return dtos;
+    }
+
+    public List<BoardWriteDTO> findByIdJoinUser(Integer boardId) {
+        Query query = em.createNativeQuery(
+                "select b.id board_id, b.created_at board_created_at, b.user_id board_user_id, u.id user_id, u.username user_username from user_tb u inner join board_tb b on u.id = b.user_id where b.id = :boardId");
+        query.setParameter("boardId", boardId);
+
+        JpaResultMapper mapper = new JpaResultMapper();
+        List<BoardWriteDTO> list = mapper.list(query, BoardWriteDTO.class);
+        return list;
     }
 
 }

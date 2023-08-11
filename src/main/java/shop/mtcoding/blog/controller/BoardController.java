@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.BoardDetailDTO;
+import shop.mtcoding.blog.dto.BoardWriteDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
@@ -147,6 +148,8 @@ public class BoardController {
             pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
         }
 
+        List<BoardWriteDTO> list = boardRepository.findByIdJoinUser(id);
+        request.setAttribute("list", list);
         request.setAttribute("dtos", dtos); // request에 board 담기
         request.setAttribute("pageOwner", pageOwner); // request에 세션에 접근한 pageOwner값(true or false) 담기
 
